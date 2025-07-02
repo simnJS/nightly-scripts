@@ -1,5 +1,5 @@
 @nightyScript(
-    name="Crypto Address Info v1.0",
+    name="Crypto Address Info v1.10",
     author="simnJS",
     description="Fetches information about cryptocurrency addresses.",
     usage="<p>cryptoinfo <currency> <address>"
@@ -37,6 +37,8 @@ def CryptoScript():
     - https://api.blockcypher.com/v1/{currency}/main/addrs/{address} - For other currencies
     
     CHANGELOG:
+    v1.10 - Added EURO conversion ( Thanks to 1gz )
+
     v1.0 - Initial release
          - Support for BTC, LTC, ETH, BCH, DOGE
          - Balance and transaction information
