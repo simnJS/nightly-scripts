@@ -115,6 +115,47 @@ def CryptoScript():
             print(f"Error fetching {currency} info: {str(e)}", type_="ERROR")
             return None
 
+    async def get_eur_conversion_rate(session, currency_symbol):
+        """Get EUR conversion rate for a cryptocurrency"""
+        url = f"https://api.coingecko.com/api/v3/simple/price"
+        
+        coingecko_ids = {
+            "BTC": "bitcoin",
+            "LTC": "litecoin", 
+            "ETH": "ethereum",
+            "BCH": "bitcoin-cash",
+            "DOGE": "dogecoin",
+            "DASH": "dash",
+            "ZEC": "zcash",
+            "BTS": "bitshares"
+        }
+        
+        currency_id = coingecko_ids.get(currency_symbol.upper())
+        if not currency_id:
+            return None
+            
+        params = {
+            "ids": currency_id,
+            "vs_currencies": "eur"
+        }
+        
+        headers = {
+            "Accept": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+        
+        try:
+            async with session.get(url, params=params, headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data.get(currency_id, {}).get("eur")
+                else:
+                    print(f"Error fetching EUR rate for {currency_symbol}: Status {response.status}", type_="WARNING")
+                    return None
+        except Exception as e:
+            print(f"Error fetching EUR rate for {currency_symbol}: {str(e)}", type_="WARNING")
+            return None
+
 
 
     @bot.command(name="cryptoinfo", usage="<currency> <address>", description="Fetches crypto address info")
@@ -126,7 +167,7 @@ def CryptoScript():
             supported_list = ", ".join(SUPPORTED_CURRENCIES.keys()).upper()
             await forwardEmbedMethod(
                 channel_id=ctx.channel.id,
-                content=f"❌ **Usage:** `<p>cryptoinfo <currency> <address>`\n\n**Supported currencies:** {supported_list}\n\n*Made by [simnJS](https://github.com/simnJS)*",
+                content=f"❌ **Usage:** `<p>cryptoinfo <currency> <address>`\n\n**Supported currencies:** {supported_list}",
                 title="Crypto Address Info"
             )
             return
@@ -138,7 +179,7 @@ def CryptoScript():
             supported_list = ", ".join(SUPPORTED_CURRENCIES.keys()).upper()
             await forwardEmbedMethod(
                 channel_id=ctx.channel.id,
-                content=f"❌ **Unsupported currency:** {currency.upper()}\n\n**Supported currencies:** {supported_list}\n\n**Want more currencies?** Contact **simnJS_** on Discord!\n\n*Made by [simnJS](https://github.com/simnJS)*",
+                content=f"❌ **Unsupported currency:** {currency.upper()}\n\n**Supported currencies:** {supported_list}\n\n**Want more currencies?** Contact **simnJS_** on Discord!",
                 title="Crypto Address Info"
             )
             return
@@ -148,7 +189,7 @@ def CryptoScript():
         if len(address) < min_length:
             await forwardEmbedMethod(
                 channel_id=ctx.channel.id,
-                content="❌ **Invalid address format.** Please provide a valid cryptocurrency address.\n\n*Made by [simnJS](https://github.com/simnJS)*",
+                content="❌ **Invalid address format.** Please provide a valid cryptocurrency address.",
                 title="Crypto Address Info"
             )
             return
@@ -172,7 +213,7 @@ def CryptoScript():
                 if not address_data:
                     await forwardEmbedMethod(
                         channel_id=ctx.channel.id,
-                        content=f"❌ **Failed to fetch information for {currency.upper()} address.**\n\nThis could mean:\n• The address doesn't exist\n• The address format is invalid\n• The API is temporarily unavailable\n\n*Made by [simnJS](https://github.com/simnJS)*",
+                        content=f"❌ **Failed to fetch information for {currency.upper()} address.**\n\nThis could mean:\n• The address doesn't exist\n• The address format is invalid\n• The API is temporarily unavailable.",
                         title="Crypto Address Info"
                     )
                     await msg.delete()
@@ -194,11 +235,30 @@ def CryptoScript():
                 total_received = f"{address_data['total_received']:.{precision}f}"
                 total_sent = f"{address_data['total_sent']:.{precision}f}"
                 
+                eur_rate = await get_eur_conversion_rate(session, address_data['currency'])
+                
+                balance_eur = ""
+                total_received_eur = ""
+                total_sent_eur = ""
+                
+                if eur_rate:
+                    if address_data['balance'] > 0:
+                        balance_eur_value = address_data['balance'] * eur_rate
+                        balance_eur = f" (≈ €{balance_eur_value:,.2f})"
+                    
+                    if address_data['total_received'] > 0:
+                        received_eur_value = address_data['total_received'] * eur_rate
+                        total_received_eur = f" (≈ €{received_eur_value:,.2f})"
+                    
+                    if address_data['total_sent'] > 0:
+                        sent_eur_value = address_data['total_sent'] * eur_rate
+                        total_sent_eur = f" (≈ €{sent_eur_value:,.2f})"
+                
                 content = f"""**Currency:** {currency_name} ({address_data['currency']})
 **Address:** `{address_data['address']}`
-**Current Balance:** **{balance} {address_data['currency']}**
-**Total Received:** {total_received} {address_data['currency']}
-**Total Sent:** {total_sent} {address_data['currency']}
+**Current Balance:** {balance} {address_data['currency']}{balance_eur}
+**Total Received:** {total_received} {address_data['currency']}{total_received_eur}
+**Total Sent:** {total_sent} {address_data['currency']}{total_sent_eur}
 **Number of Transactions:** **{address_data['n_tx']}**"""
 
                 explorer_links = {
@@ -215,8 +275,6 @@ def CryptoScript():
                 if currency in explorer_links:
                     content += f"\n\n**Blockchain Explorer:**\n• [View Address Details]({explorer_links[currency]})"
                 
-                content += f"\n\n*Made by [simnJS](https://github.com/simnJS)*"
-
                 await forwardEmbedMethod(
                     channel_id=ctx.channel.id,
                     content=content,
@@ -230,10 +288,10 @@ def CryptoScript():
             print(f"Error in cryptoinfo command: {str(e)}", type_="ERROR")
             await forwardEmbedMethod(
                 channel_id=ctx.channel.id,
-                content=f"❌ **Error occurred: {str(e)}**\n\n*Made by [simnJS](https://github.com/simnJS)*",
+                content=f"❌ **Error occurred: {str(e)}**",
                 title="Crypto Address Info"
             )
             updateConfigData("private", current_private)
             await msg.delete()
 
-CryptoScript() 
+CryptoScript()
