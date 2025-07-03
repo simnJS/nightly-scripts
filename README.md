@@ -17,6 +17,7 @@ A comprehensive collection of automation scripts for the Nighty Discord selfbot,
 - **🎤 Auto Voice Channel Joining** - Automatically join voice channels when slots become available
 - **💰 Cryptocurrency Address Info** - Lookup information for various cryptocurrency addresses
 - **🏛️ Discord Server Management** - Manage and leave Discord servers with ease
+- **📊 Message Counter** - Count messages for safe purging operations without damage
 
 ## 📦 Scripts Overview
 
@@ -89,6 +90,47 @@ Discord server management interface with visual guild listing.
 
 **Usage:**
 Access the "Guilds Manager" tab in Nighty to view and manage servers.
+
+### 📊 Message Counter v1.0
+**File:** `message_counter.py`
+**Author:** simnJS
+
+Safe message counting tool for calculating purge operations without damage.
+
+**Features:**
+- Count messages from a specific message ID to current time
+- Work from any channel/server with proper channel/server IDs
+- Show detailed message information and timestamps
+- Safe purge calculation with exact counts
+- Error handling for invalid message IDs and inaccessible channels
+- Cross-server counting with permissions validation
+
+**Commands:**
+```
+<p>count <message_id>                              - Count in current channel
+<p>count <channel_id> <message_id>                 - Count in specific channel  
+<p>count <guild_id> <channel_id> <message_id>      - Count in specific server/channel
+```
+
+**Examples:**
+```
+<p>count 1234567890123456789
+<p>count 987654321098765432 1234567890123456789
+<p>count 111222333444555666 987654321098765432 1234567890123456789
+```
+
+**Usage Scenario:**
+1. Find the message ID you want to purge FROM
+2. Use `<p>count` with appropriate IDs to see how many messages would be affected
+3. Use the count for safe purging operations from any channel/server
+
+**Features:**
+- Shows target message details (author, content preview, timestamp)
+- Counts messages after the target message
+- Provides total purge count (including target message)
+- Displays time information and safety warnings
+
+### 🚀 Nighty Auto Start
 **File:** `Nighty Auto Start.py`
 **Author:** Flixer (improved version)
 
