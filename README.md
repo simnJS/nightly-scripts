@@ -14,31 +14,10 @@ A comprehensive collection of automation scripts for the Nighty Discord selfbot,
 
 ## ✨ Features
 
-- **🎤 Auto Voice Channel Joining** - Automatically join voice channels when slots become available
 - **💰 Cryptocurrency Address Info** - Lookup information for various cryptocurrency addresses
 - **🏛️ Discord Server Management** - Manage and leave Discord servers with ease
 
 ## 📦 Scripts Overview
-
-### 🎤 Auto Voice Channel Joiner v2.0
-**File:** `auto_voice_joiner.py`
-**Author:** simnJS
-
-Advanced voice channel auto-joiner with modern UI interface.
-
-**Features:**
-- Modern UI for configuration and monitoring
-- Real-time status tracking and logging
-- Configurable check intervals and attempt limits
-- Smart channel validation and testing
-- Automatic retry system
-- Success/failure statistics tracking
-
-**Usage:**
-1. Open the "Auto Voice Joiner" tab in Nighty UI
-2. Enter target voice channel ID
-3. Configure check interval and max attempts
-4. Click "Start Auto Joiner"
 
 ### 💰 Crypto Address Info v1.10
 **File:** `cryptoinfo.py`
@@ -123,12 +102,6 @@ git clone <repository-url>
 Use the designated command prefixes as specified in each script's documentation.
 
 ## ⚙️ Configuration
-
-### Auto Voice Joiner
-- **Target Channel ID**: Voice channel to automatically join
-- **Check Interval**: Time between availability checks (seconds)
-- **Max Attempts**: Maximum number of join attempts
-- **Debug Mode**: Enable detailed logging
 
 ### Crypto Info
 - **API Endpoints**: Uses blockchain.info and blockcypher.com APIs
